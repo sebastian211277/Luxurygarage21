@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | Luxury Garage</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .login-box { max-width: 400px; margin: 150px auto; padding: 40px; background: rgba(20,20,20,0.9); border-top: 4px solid #d4af37; border-radius: 8px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #333; border: 1px solid #444; color: white; }
+        button { width: 100%; padding: 12px; background: #d4af37; border: none; color: black; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body style="background: #0a0a0a;">
+    <div class="login-box">
+        <h2 style="color:white; text-align:center; font-family:'Playfair Display';">ACCESO ADMIN</h2>
+        <input type="text" id="user" placeholder="Usuario">
+        <input type="password" id="pass" placeholder="Contraseña">
+        <button onclick="login()">ENTRAR</button>
+        <p id="msg" style="color:red; text-align:center; margin-top:10px;"></p>
+    </div>
+    <script>
+        async function login() {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username: user.value, password: pass.value })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                localStorage.setItem('adminToken', data.token);
+                window.location.href = 'admin.html';
+            } else { msg.innerText = data.message; }
+        }
+    </script>
+</body>
+</html>

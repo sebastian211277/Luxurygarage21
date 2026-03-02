@@ -1,0 +1,338 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap');
+
+:root {
+    --bg-dark: #121213;
+    --card-bg: #1c1c1e;
+    --gold: #d4af37;
+    --text-main: #ffffff;
+    --text-muted: #a1a1a6;
+}
+
+body {
+    margin: 0;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+}
+
+h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+/* --- HEADER DE LUJO --- */
+header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+/* Menú Izquierda */
+.menu-btn {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #000;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.menu-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 40px;
+    background: #fff;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: 0.3s ease;
+}
+/* Mostrar menú al pasar el mouse (PC) o click (JS) */
+.menu-container:hover .menu-dropdown, .menu-dropdown.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.menu-dropdown a {
+    display: block;
+    padding: 15px 30px;
+    text-decoration: none;
+    color: #333;
+    transition: 0.2s;
+}
+.menu-dropdown a:hover {
+    background: #f5f5f5;
+    color: var(--gold);
+    padding-left: 35px; /* Pequeño desplazamiento elegante */
+}
+
+/* Logo Derecha (Animación SHINE) */
+.brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(to right, #000 20%, #d4af37 50%, #000 80%);
+    background-size: 200% auto;
+    color: #000;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 4s linear infinite;
+}
+
+@keyframes shine {
+    to { background-position: 200% center; }
+}
+
+/* --- HERO SECTION (CARRUSEL) --- */
+.hero {
+    position: relative;
+    height: 80vh; /* O la altura que tengas */
+    overflow: hidden;
+    cursor: pointer; /* Para que toda la sección parezca clickeable */
+}
+
+.hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: background-image 0.5s ease-in-out;
+    z-index: 1; /* La imagen va al fondo */
+}
+
+/* Si tienes un overlay, asegúrate de que no sea demasiado oscuro */
+.hero::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)); /* Ajusta el 0.5 si sigue muy oscuro */
+    z-index: 2;
+    pointer-events: none; /* ¡IMPORTANTE! Esto permite que los clics pasen a través del filtro */
+}
+
+.hero-content {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    z-index: 10;
+    /* Fondo con gradiente sutil: oscuro a la izquierda, casi invisible a la derecha */
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.2));
+    backdrop-filter: blur(8px); /* Desenfoque más ligero */
+    padding: 20px 30px; /* Reducimos el tamaño del cuadro */
+    border-left: 3px solid #d4af37; /* Línea dorada más fina y elegante */
+    border-radius: 2px;
+    box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.3);
+    width: fit-content; /* El cuadro solo mide lo que mide el texto */
+    max-width: 400px; /* Límite para que no crezca demasiado */
+    pointer-events: none;
+}
+
+.hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; /* Un poco más pequeño para mayor sofisticación */
+    color: #fff;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    line-height: 1.2;
+}
+
+.hero-price {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem; /* Más discreto */
+    color: #d4af37;
+    margin-top: 8px;
+    font-weight: 400;
+    letter-spacing: 1px;
+}
+
+.hero-desc {
+    color: #d4af37; /* Dorado también para la etiqueta superior */
+    font-size: 0.7rem;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    font-weight: 600;
+}
+
+/* 1. Quitamos el cuadro negro y dejamos que respire */
+.brand-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 60px; /* Más espacio entre logos para mayor elegancia */
+    padding: 60px 20px;
+    background: transparent; /* Eliminamos el fondo negro */
+    flex-wrap: wrap;
+    border: none; /* Aseguramos que no haya bordes */
+}
+
+/* 2. Hacemos los logos más grandes y nítidos */
+.brand-item {
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    opacity: 0.6;
+    filter: grayscale(100%) brightness(1.5); /* Efecto plateado sutil */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.brand-item img {
+    height: 80px; /* Doblamos el tamaño para que luzcan (antes era 40px) */
+    width: auto;
+    object-fit: contain;
+}
+
+/* 3. Efecto Hover más impactante */
+.brand-item:hover {
+    opacity: 1;
+    filter: grayscale(0%) brightness(1); /* Recupera su color original */
+    transform: scale(1.15); /* Un pequeño zoom al pasar el mouse */
+}
+
+/* 4. Estilo para el título "EXPLORA POR MARCA" */
+.section-title-brands {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    color: #fff;
+    font-size: 1.5rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+
+
+
+/* --- GRID INVENTARIO --- */
+.container { max-width: 1200px; margin: 50px auto; padding: 0 20px; }
+.section-title { text-align: center; color: var(--gold); text-transform: uppercase; margin-bottom: 40px; letter-spacing: 3px; }
+
+/* Asegura que el grid no colapse los elementos */
+.grid {
+    display: grid;
+    /* Crea columnas automáticas de mínimo 320px */
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+    gap: 30px; /* Espacio de seguridad entre tarjetas */
+    padding: 40px 5%;
+    align-items: stretch; /* Mantiene las tarjetas con la misma altura */
+}
+
+/* Contenedor de la Tarjeta */
+.glass-card {
+    background: #1a1a1a; /* Fondo oscuro profundo */
+    border: 1px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Efecto Hover: Elevación y Brillo Dorado */
+.glass-card:hover {
+    transform: translateY(-10px);
+    border-color: #d4af37; /* Borde dorado al pasar el mouse */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.1);
+}
+
+/* Imagen del Auto */
+.car-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.glass-card:hover .car-image {
+    transform: scale(1.05); /* Zoom suave a la imagen */
+}
+
+/* Contenedor de Información */
+.car-info {
+    padding: 25px;
+    background: linear-gradient(to bottom, #1a1a1a, #111);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Marca (Badge superior) */
+.badge {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    color: #d4af37;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+/* Modelo del Auto */
+.car-info h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #fff;
+    margin: 0;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* Año y Detalles */
+.car-info p {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: #888;
+    margin: 0;
+}
+
+/* Precio Destacado */
+.price {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.2rem;
+    color: #fff;
+    font-weight: 300;
+    margin-top: 15px;
+    border-top: 1px solid #333;
+    padding-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price::after {
+    content: 'VIEW DETAILS →';
+    font-size: 0.6rem;
+    color: #d4af37;
+    letter-spacing: 1px;
+    font-weight: 700;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.glass-card:hover .price::after {
+    opacity: 1;
+}

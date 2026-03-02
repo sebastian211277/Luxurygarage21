@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalles | Luxury Garage</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .details-container { max-width: 1200px; margin: 100px auto; display: grid; grid-template-columns: 1.5fr 1fr; gap: 50px; padding: 20px; }
+        .main-img { width: 100%; border-radius: 8px; border: 1px solid #333; }
+        .gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+        .gallery img { width: 100%; height: 80px; object-fit: cover; cursor: pointer; opacity: 0.6; transition: 0.3s; }
+        .gallery img:hover { opacity: 1; }
+        .info-panel { background: #1a1a1a; padding: 30px; border-radius: 12px; border-left: 4px solid #d4af37; }
+    </style>
+</head>
+<body>
+    <div class="details-container" id="detailsContent">
+        </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const carId = params.get('id');
+
+        async function loadCarDetails() {
+            const res = await fetch(`/api/cars/${carId}`);
+            const car = await res.json();
+            
+            document.getElementById('detailsContent').innerHTML = `
+                <div>
+                    <img src="${car.imagenes[0]}" class="main-img" id="mainView">
+                    <div class="gallery">
+                        ${car.imagenes.map(img => `<img src="${img}" onclick="document.getElementById('mainView').src='${img}'">`).join('')}
+                    </div>
+                </div>
+                <div class="info-panel">
+                    <h1 style="font-family:'Playfair Display'; font-size: 3rem;">${car.marca} ${car.modelo}</h1>
+                    <p style="color: #d4af37; font-size: 1.5rem;">$${car.precio.toLocaleString()} USD</p>
+                    <hr style="border:0; border-top:1px solid #333; margin: 20px 0;">
+                    <p><strong>Año:</strong> ${car.anio}</p>
+                    <p><strong>Categoría:</strong> ${car.categoria}</p>
+                    <p style="margin-top: 20px; line-height: 1.6; color: #ccc; white-space: pre-line;">${car.descripcion || 'Sin descripción disponible.'}</p>
+                    <button onclick="window.history.back()" style="margin-top:30px; background:none; color:#d4af37; border:1px solid #d4af37; padding:10px 20px; cursor:pointer;">&larr; VOLVER</button>
+                </div>
+            `;
+        }
+        loadCarDetails();
+    </script>
+</body>
+</html>

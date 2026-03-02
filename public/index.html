@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxury Garage | Exclusive Inventory</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="menu-container" id="menuContainer">
+            <div class="menu-btn">
+                <span>☰ MENU</span>
+            </div>
+            <div class="menu-dropdown">
+                <a href="#" onclick="filterCars('')">View All</a>
+                <a href="#" onclick="filterCars('Cars')">Sports & Sedans</a>
+                <a href="#" onclick="filterCars('SUV')">SUVs</a>
+                <a href="#" onclick="filterCars('Pickups')">Pickups</a>
+                <a href="#" onclick="filterCars('Hybrid & Electric')">Hybrid & Electric</a>
+            </div>
+        </div>
+        <div class="brand-name">Luxury Garage</div>
+    </header>
+
+    <section class="hero" id="heroSection">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-content">
+        <p class="hero-desc">Exclusive Inventory</p>
+        <h2 class="hero-title" id="heroTitle">Cargando...</h2>
+        <div class="hero-price" id="heroPrice"></div>
+    </div>
+</section>
+
+<!--<input id="searchInput"> -->
+
+    <section style="padding: 40px 20px; background: #111; text-align: center; border-top: 1px solid #333; border-bottom: 1px solid #333;">
+        <h2 style="color: #fff; margin-bottom: 30px; font-family: 'Playfair Display', serif;">EXPLORA POR MARCA</h2>
+        
+        <div class="brand-container">
+            <div class="brand-item" onclick="filterByMake('all')">
+                <span style="color: white; font-weight: bold; font-size: 1.2rem; line-height: 60px;">TODAS</span>
+            </div>
+
+            <div class="brand-item" onclick="filterByMake('Ferrari')">
+                <img src="ferrari.png" alt="Ferrari">
+            </div>
+
+            <div class="brand-item" onclick="filterByMake('Porsche')">
+                <img src="porsche.png" alt="Porsche">
+            </div>
+
+            <div class="brand-item" onclick="filterByMake('Lamborghini')">
+                <img src="lamborghini.png" alt="Lamborghini">
+            </div>
+
+            <div class="brand-item" onclick="filterByMake('Mercedes-Benz')">
+                <img src="mercedes.png" alt="Mercedes">
+            </div>
+        </div>
+    </section>
+
+    <div class="container" id="seccion-detalles">
+        <h3 class="section-title" id="gridTitle">Inventario Completo</h3>
+        <div class="grid" id="grid">
+            </div>
+    </div>
+
+    <script src="main.js"></script>
+    </body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Luxury Garage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #121213;
+            --panel-gray: #1c1c1e;
+            --gold: #d4af37;
+            --text-light: #f5f5f7;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --info: #3498db;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        header a {
+            color: #666;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        header a:hover {
+            color: var(--gold);
+        }
+
+        /* Layout principal */
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        /* Paneles */
+        .panel {
+            background: var(--panel-gray);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            height: fit-content;
+        }
+
+        h2 {
+            color: var(--gold);
+            margin-top: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        /* Estilos del Formulario */
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: #000;
+            border: 1px solid #333;
+            color: white;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--gold);
+            outline: none;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: #2c2c2e;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #444;
+        }
+
+        .checkbox-group input {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+            cursor: pointer;
+            accent-color: var(--gold);
+        }
+
+        .checkbox-group label {
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--gold);
+            margin: 0;
+        }
+
+        /* Botones de Acción */
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            font-family: 'Inter', sans-serif;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        #btnSubmit {
+            flex: 1;
+            background: var(--gold);
+            color: black;
+        }
+
+        #btnSubmit:hover:not(:disabled) {
+            background: #b5952f;
+        }
+
+        #btnSubmit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #btnCancel {
+            flex: 1;
+            background: #666;
+            color: white;
+        }
+
+        #btnCancel:hover {
+            background: #555;
+        }
+
+        /* Estilos de la Tabla */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #333;
+        }
+
+        th {
+            color: var(--gold);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            background: #0a0a0a;
+        }
+
+        tr:hover {
+            background: #2c2c2e;
+        }
+
+        td img {
+            display: block;
+        }
+
+        /* Botones en tabla */
+        table button {
+            padding: 5px 10px;
+            font-size: 0.75rem;
+            margin-right: 5px;
+        }
+
+        .btn-edit {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2980b9;
+        }
+
+        .btn-delete {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+
+        /* Estado de edición */
+        .editing-mode {
+            border-left: 4px solid var(--info);
+        }
+
+        .editing-mode h2::after {
+            content: " (EDITANDO)";
+            font-size: 0.8rem;
+            color: var(--info);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        /* Estilos para grid de dos columnas en formulario */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .form-grid > div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-grid input {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Luxury Garage <span style="color:var(--gold)">Manager</span></h1>
+        <a href="/" style="text-decoration: none;">← Volver al Sitio Web</a>
+    </header>
+
+    <div class="dashboard">
+        
+        <!-- Panel de Formulario -->
+        <div class="panel" id="formPanel">
+            <h2>Gestión de Vehículo</h2>
+            <form id="carForm">
+                <label>Nombre / Título</label>
+                <input type="text" id="name" name="name" placeholder="Ej: Oferta Especial de Verano" required>
+                
+                <label>Marca</label>
+                <input type="text" id="brand" name="brand" placeholder="Ej: Porsche" required>
+
+                <label>Modelo</label>
+                <input type="text" id="model" name="model" placeholder="Ej: 911 GT3" required>
+                
+                <div class="form-grid">
+                    <div>
+                        <label>Año</label>
+                        <input type="number" id="year" name="year" placeholder="2024" required>
+                    </div>
+                    <div>
+                        <label>Precio (USD)</label>
+                        <input type="number" id="price" name="price" placeholder="250000" required>
+                    </div>
+                </div>
+
+                <label>Categoría</label>
+                <select id="type" name="type" required>
+                    <option value="">-- Selecciona una categoría --</option>
+                    <option value="Cars">Cars (Deportivos/Sedan)</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Pickups">Pickups</option>
+                    <option value="Hybrid & Electric">Hybrid & Electric</option>
+                </select>
+
+                <label>Descripción</label>
+                <textarea id="description" name="description" rows="4" placeholder="Detalles del motor, interior, estado..."></textarea>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="isFeatured" name="isFeatured">
+                    <label for="isFeatured">🏆 Destacar en Portada</label>
+                </div>
+
+                <label>Fotografías (Puedes seleccionar varias)</label>
+                <input type="file" id="imageInput" name="imagenes" multiple accept="image/*">
+                
+                <div class="form-actions">
+                    <button type="submit" id="btnSubmit">Guardar Auto</button>
+                    <button type="button" id="btnCancel" style="display: none;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Panel de Inventario -->
+        <div class="panel">
+            <h2>Inventario Actual</h2>
+            <table id="carsTable">
+                <thead>
+                    <tr>
+                        <th width="80">Foto</th>
+                        <th>Vehículo</th>
+                        <th>Año</th>
+                        <th>Precio</th>
+                        <th style="text-align: right;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="carsTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
