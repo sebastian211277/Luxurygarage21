@@ -19,10 +19,12 @@ if (!fs.existsSync(uploadsDir)) {
 // 2. MIDDLEWARES
 app.use(cors());
 app.use(express.json());
+// 👇 CORRECCIÓN 1: Necesario para que Express entienda datos de formularios HTML
+app.use(express.urlencoded({ extended: true })); 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(uploadsDir));
 
-// 3. CONEXIÓN A MONGODB (Versión simplificada para evitar errores de opciones)
+// 3. CONEXIÓN A MONGODB
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('🟢 Conexión a MongoDB exitosa'))
     .catch(err => console.error('🔴 Error de conexión:', err));
@@ -91,7 +93,8 @@ app.post('/api/cars', upload.array('imagenes', 6), async (req, res) => {
             precio: parseFloat(price),
             categoria: type,
             descripcion: description,
-            esDestacado: isFeatured === 'on' || isFeatured === true,
+            // 👇 Mejora en la lógica del booleano
+            esDestacado: isFeatured === 'on' || isFeatured === 'true' || isFeatured === true,
             imagenes: filePaths
         });
 
@@ -111,7 +114,6 @@ app.put('/api/cars/:id', upload.array('imagenes', 6), async (req, res) => {
         
         if (!existingCar) return res.status(404).json({ message: "Auto no encontrado" });
 
-        // Si se suben nuevas fotos, se usan; si no, se mantienen las anteriores
         let imagenes = existingCar.imagenes;
         if (req.files && req.files.length > 0) {
             imagenes = req.files.map(f => `/uploads/${f.filename}`);
@@ -127,7 +129,7 @@ app.put('/api/cars/:id', upload.array('imagenes', 6), async (req, res) => {
                 precio: parseFloat(price),
                 categoria: type,
                 descripcion: description,
-                esDestacado: isFeatured === 'on' || isFeatured === true,
+                esDestacado: isFeatured === 'on' || isFeatured === 'true' || isFeatured === true,
                 imagenes: imagenes
             },
             { new: true }
@@ -150,7 +152,4 @@ app.delete('/api/cars/:id', async (req, res) => {
     }
 });
 
-// 7. LANZAMIENTO
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🏁 Luxury Garage corriendo en http://localhost:${PORT}` );
-});
+// 👇 CORRECCIÓN 2: Ruta explícita para evitar la
