@@ -5,9 +5,11 @@ const multer = require('multer');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecreto123';
 
 // 1. CREAR CARPETA DE UPLOADS SI NO EXISTE
 const uploadsDir = path.join(__dirname, 'public', 'uploads');
@@ -22,7 +24,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(uploadsDir));
 
-// 3. CONEXIÓN A MONGODB (Versión simplificada para evitar errores de opciones)
+// 3. CONEXIÓN A MONGODB
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('🟢 Conexión a MongoDB exitosa'))
     .catch(err => console.error('🔴 Error de conexión:', err));
@@ -39,6 +41,7 @@ const carSchema = new mongoose.Schema({
     esDestacado: Boolean,
     imagenes: [String]
 });
+
 const Car = mongoose.model('Car', carSchema);
 
 // 5. CONFIGURACIÓN DE MULTER
@@ -50,11 +53,55 @@ const storage = multer.diskStorage({
         cb(null, Date.now() + '-' + file.originalname);
     }
 });
+
 const upload = multer({ storage: storage });
 
-// 6. RUTAS DE LA API
+// ========================================
+// 🔐 MIDDLEWARE PARA PROTEGER RUTAS
+// ========================================
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
 
-// Obtener todos los autos
+    if (!token) {
+        return res.status(401).json({ message: 'Token requerido' });
+    }
+
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ message: 'Token inválido' });
+        }
+
+        req.user = user;
+        next();
+    });
+};
+
+// ========================================
+// 6. RUTAS DE LA API
+// ========================================
+
+// 🔐 LOGIN
+app.post('/api/auth/login', async (req, res) => {
+    const { username, password } = req.body;
+    console.log(`Intentando login con: ${username}`);
+
+    if (username === 'Shyrio' && password === 'Password123') {
+        const token = jwt.sign(
+            { user: username },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        console.log("✅ Login exitoso");
+        return res.json({ token });
+    }
+
+    console.log("❌ Credenciales incorrectas");
+    res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
+});
+
+// Obtener todos los autos (PÚBLICA)
 app.get('/api/cars', async (req, res) => {
     try {
         const cars = await Car.find().sort({ _id: -1 });
@@ -64,7 +111,7 @@ app.get('/api/cars', async (req, res) => {
     }
 });
 
-// Obtener un auto por ID
+// Obtener un auto por ID (PÚBLICA)
 app.get('/api/cars/:id', async (req, res) => {
     try {
         const car = await Car.findById(req.params.id);
@@ -75,10 +122,11 @@ app.get('/api/cars/:id', async (req, res) => {
     }
 });
 
-// GUARDAR auto nuevo (POST)
-app.post('/api/cars', upload.array('imagenes', 6), async (req, res) => {
+// GUARDAR auto nuevo (PROTEGIDA)
+app.post('/api/cars', authenticateToken, upload.array('imagenes', 6), async (req, res) => {
     try {
         const { name, brand, model, year, price, type, description, isFeatured } = req.body;
+
         const filePaths = req.files && req.files.length > 0 
             ? req.files.map(f => `/uploads/${f.filename}`) 
             : ['/uploads/default.jpg'];
@@ -97,21 +145,21 @@ app.post('/api/cars', upload.array('imagenes', 6), async (req, res) => {
 
         await newCar.save();
         res.status(201).json({ message: 'Vehículo guardado con éxito' });
+
     } catch (error) {
         console.error("Error al guardar:", error);
         res.status(400).json({ message: 'Error al procesar el vehículo' });
     }
 });
 
-// EDITAR auto existente (PUT)
-app.put('/api/cars/:id', upload.array('imagenes', 6), async (req, res) => {
+// EDITAR auto existente (PROTEGIDA)
+app.put('/api/cars/:id', authenticateToken, upload.array('imagenes', 6), async (req, res) => {
     try {
         const { name, brand, model, year, price, type, description, isFeatured } = req.body;
         const existingCar = await Car.findById(req.params.id);
         
         if (!existingCar) return res.status(404).json({ message: "Auto no encontrado" });
 
-        // Si se suben nuevas fotos, se usan; si no, se mantienen las anteriores
         let imagenes = existingCar.imagenes;
         if (req.files && req.files.length > 0) {
             imagenes = req.files.map(f => `/uploads/${f.filename}`);
@@ -134,14 +182,15 @@ app.put('/api/cars/:id', upload.array('imagenes', 6), async (req, res) => {
         );
 
         res.json({ message: 'Vehículo actualizado con éxito', car: updatedCar });
+
     } catch (error) {
         console.error("Error al actualizar:", error);
         res.status(400).json({ message: 'Error al actualizar el vehículo' });
     }
 });
 
-// ELIMINAR auto (DELETE)
-app.delete('/api/cars/:id', async (req, res) => {
+// ELIMINAR auto (PROTEGIDA)
+app.delete('/api/cars/:id', authenticateToken, async (req, res) => {
     try {
         await Car.findByIdAndDelete(req.params.id);
         res.json({ message: 'Vehículo eliminado correctamente' });
@@ -150,7 +199,9 @@ app.delete('/api/cars/:id', async (req, res) => {
     }
 });
 
+// ========================================
 // 7. LANZAMIENTO
+// ========================================
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🏁 Luxury Garage corriendo en http://localhost:${PORT}` );
+    console.log(`🏁 Luxury Garage corriendo en http://localhost:${PORT}`);
 });
