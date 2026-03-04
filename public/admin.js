@@ -189,3 +189,7 @@ function resetForm() {
     document.getElementById('carForm').reset();
     editingCarId = null;
 }
+
+if (!localStorage.getItem("token")) {
+    window.location.replace("login.html");
+}
