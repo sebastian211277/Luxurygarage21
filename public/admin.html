@@ -272,9 +272,12 @@
     </style>
 </head>
 <body>
-    <header>
-        <h1>Luxury Garage <span style="color:var(--gold)">Manager</span></h1>
-        <a href="/" style="text-decoration: none;">← Volver al Sitio Web</a>
+    <header style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <h1>Luxury Garage <span style="color:var(--gold)">Manager</span></h1>
+            <a href="/" style="text-decoration: none;">← Volver al Sitio Web</a>
+        </div>
+        <button onclick="logout()" style="background:#333; color:#888; border:1px solid #444; padding:8px 16px; border-radius:4px; cursor:pointer; font-size:0.85rem; transition:0.3s;" onmouseover="this.style.color='#e74c3c'; this.style.borderColor='#e74c3c'" onmouseout="this.style.color='#888'; this.style.borderColor='#444'">Cerrar Sesión</button>
     </header>
 
     <div class="dashboard">

@@ -1,6 +1,12 @@
-// 🔐 Verificar si existe token
+// ========================================
+// 🔐 PROTECCIÓN DE RUTA - Verificación de token
+// ========================================
+// Se verifica el token ANTES de que el DOM cargue.
+// Si no existe token, se redirige inmediatamente.
 const token = localStorage.getItem("token");
-if (!token) window.location.href = 'login.html';
+if (!token) {
+    window.location.replace('login.html');
+}
 
 // Estado global
 let isLoading = false;
@@ -26,7 +32,7 @@ async function fetchInventory() {
             </td>
         </tr>`;
 
-        const response = await fetch('/api/cars'); // 👈 Ruta pública
+        const response = await fetch('/api/cars'); // Ruta pública
 
         if (!response.ok) {
             throw new Error(`HTTP Error: ${response.status}`);
@@ -63,14 +69,22 @@ async function fetchInventory() {
                 <td>${car.anio}</td>
                 <td style="color:#d4af37;">$${car.precio?.toLocaleString()}</td>
                 <td style="text-align:right;">
-                    <button onclick="editCar('${car._id}')">EDITAR</button>
-                    <button onclick="deleteCar('${car._id}')">ELIMINAR</button>
+                    <button class="btn-edit" onclick="editCar('${car._id}')">EDITAR</button>
+                    <button class="btn-delete" onclick="deleteCar('${car._id}')">ELIMINAR</button>
                 </td>
             </tr>`;
         }).join('');
 
     } catch (err) {
         console.error(err);
+
+        // Si el error es 401 o 403, el token expiró → redirigir al login
+        if (err.message.includes('401') || err.message.includes('403')) {
+            localStorage.removeItem('token');
+            window.location.replace('login.html');
+            return;
+        }
+
         tableBody.innerHTML = `
         <tr>
             <td colspan="5" style="color:#e74c3c;text-align:center;">
@@ -104,6 +118,7 @@ async function handleFormSubmit(e) {
     try {
         isLoading = true;
         btn.disabled = true;
+        btn.textContent = editingCarId ? 'Actualizando...' : 'Guardando...';
 
         const formData = new FormData(form);
 
@@ -120,22 +135,30 @@ async function handleFormSubmit(e) {
             body: formData
         });
 
+        // Si el token expiró, redirigir al login
+        if (response.status === 401 || response.status === 403) {
+            localStorage.removeItem('token');
+            window.location.replace('login.html');
+            return;
+        }
+
         const data = await response.json();
 
         if (!response.ok) {
             throw new Error(data.message);
         }
 
-        alert(editingCarId ? "Auto actualizado" : "Auto guardado");
+        alert(editingCarId ? "✅ Auto actualizado correctamente" : "✅ Auto guardado correctamente");
 
         resetForm();
         await fetchInventory();
 
     } catch (error) {
-        alert("Error: " + error.message);
+        alert("❌ Error: " + error.message);
     } finally {
         isLoading = false;
         btn.disabled = false;
+        btn.textContent = editingCarId ? 'Actualizar Auto' : 'Guardar Auto';
     }
 }
 
@@ -156,13 +179,21 @@ async function editCar(id) {
     document.getElementById('isFeatured').checked = car.esDestacado || false;
 
     editingCarId = id;
+
+    // Indicar visualmente que estamos editando
+    document.getElementById('formPanel').classList.add('editing-mode');
+    document.getElementById('btnSubmit').textContent = 'Actualizar Auto';
+    document.getElementById('btnCancel').style.display = 'block';
+
+    // Hacer scroll al formulario en mobile
+    document.getElementById('formPanel').scrollIntoView({ behavior: 'smooth' });
 }
 
 /**
  * Eliminar auto
  */
 async function deleteCar(id) {
-    if (!confirm("¿Eliminar vehículo?")) return;
+    if (!confirm("¿Estás seguro de que deseas eliminar este vehículo?")) return;
 
     const response = await fetch(`/api/cars/${id}`, {
         method: 'DELETE',
@@ -171,14 +202,21 @@ async function deleteCar(id) {
         }
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-        alert("Error: " + data.message);
+    // Si el token expiró, redirigir al login
+    if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem('token');
+        window.location.replace('login.html');
         return;
     }
 
-    alert("Auto eliminado");
+    const data = await response.json();
+
+    if (!response.ok) {
+        alert("❌ Error: " + data.message);
+        return;
+    }
+
+    alert("✅ Vehículo eliminado correctamente");
     fetchInventory();
 }
 
@@ -187,9 +225,16 @@ async function deleteCar(id) {
  */
 function resetForm() {
     document.getElementById('carForm').reset();
+    document.getElementById('formPanel').classList.remove('editing-mode');
+    document.getElementById('btnSubmit').textContent = 'Guardar Auto';
+    document.getElementById('btnCancel').style.display = 'none';
     editingCarId = null;
 }
 
-if (!localStorage.getItem("token")) {
-    window.location.replace("login.html");
+/**
+ * Cerrar sesión
+ */
+function logout() {
+    localStorage.removeItem('token');
+    window.location.replace('login.html');
 }
