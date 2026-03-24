@@ -2,34 +2,206 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Luxury Garage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        .login-box { max-width: 400px; margin: 150px auto; padding: 40px; background: rgba(20,20,20,0.9); border-top: 4px solid #d4af37; border-radius: 8px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #333; border: 1px solid #444; color: white; }
-        button { width: 100%; padding: 12px; background: #d4af37; border: none; color: black; font-weight: bold; cursor: pointer; }
+        body {
+            background: #0a0a0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .login-box {
+            max-width: 420px;
+            width: 90%;
+            padding: 40px;
+            background: rgba(20, 20, 20, 0.95);
+            border-top: 4px solid #d4af37;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .login-box h2 {
+            color: white;
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 30px;
+            font-size: 1.6rem;
+            letter-spacing: 2px;
+        }
+
+        .login-box h2 span {
+            color: #d4af37;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #888;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            background: #1c1c1e;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: white;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: #d4af37;
+            border: none;
+            border-radius: 6px;
+            color: black;
+            font-weight: 700;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover:not(:disabled) {
+            background: #b5952f;
+        }
+
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #msg {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #555;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.3s;
+        }
+
+        .back-link a:hover {
+            color: #d4af37;
+        }
     </style>
 </head>
-<body style="background: #0a0a0a;">
+<body>
     <div class="login-box">
-        <h2 style="color:white; text-align:center; font-family:'Playfair Display';">ACCESO ADMIN</h2>
-        <input type="text" id="user" placeholder="Usuario">
-        <input type="password" id="pass" placeholder="Contraseña">
-        <button onclick="login()">ENTRAR</button>
-        <p id="msg" style="color:red; text-align:center; margin-top:10px;"></p>
+        <h2>ACCESO <span>ADMIN</span></h2>
+
+        <div class="form-group">
+            <label for="username">Usuario</label>
+            <input type="text" id="username" placeholder="Ingresa tu usuario" autocomplete="username">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" placeholder="Ingresa tu contraseña" autocomplete="current-password">
+        </div>
+
+        <button class="btn-login" id="btnLogin" onclick="login()">ENTRAR</button>
+        <p id="msg"></p>
+
+        <div class="back-link">
+            <a href="/">← Volver al sitio</a>
+        </div>
     </div>
+
     <script>
+        // Si ya hay token válido, redirigir directamente al admin
+        if (localStorage.getItem('token')) {
+            window.location.replace('admin.html');
+        }
+
+        // Permitir login con la tecla Enter
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') login();
+        });
+
         async function login() {
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ username: user.value, password: pass.value })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                localStorage.setItem('token', data.token);
-                window.location.href = 'admin.html';
-            } else { msg.innerText = data.message; }
+            const usernameEl = document.getElementById('username');
+            const passwordEl = document.getElementById('password');
+            const msgEl = document.getElementById('msg');
+            const btnEl = document.getElementById('btnLogin');
+
+            const username = usernameEl.value.trim();
+            const password = passwordEl.value;
+
+            // Validación básica del lado cliente
+            if (!username || !password) {
+                msgEl.textContent = 'Por favor completá usuario y contraseña.';
+                return;
+            }
+
+            // Deshabilitar botón mientras se procesa
+            btnEl.disabled = true;
+            btnEl.textContent = 'Verificando...';
+            msgEl.textContent = '';
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.token) {
+                    // Guardar token y redirigir
+                    localStorage.setItem('token', data.token);
+                    window.location.replace('admin.html');
+                } else {
+                    msgEl.textContent = data.message || 'Usuario o contraseña incorrectos.';
+                    passwordEl.value = '';
+                    passwordEl.focus();
+                }
+
+            } catch (err) {
+                console.error('Error de red:', err);
+                msgEl.textContent = 'Error de conexión. Verificá tu internet e intentá de nuevo.';
+            } finally {
+                btnEl.disabled = false;
+                btnEl.textContent = 'ENTRAR';
+            }
         }
     </script>
 </body>
