@@ -9,7 +9,8 @@ const jwt = require("jsonwebtoken");
 
 // IMPORTACIÓN CORREGIDA
 const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary").CloudinaryStorage; 
+const CloudinaryStorage = require("multer-storage-cloudinary");
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -56,17 +57,15 @@ imagenes: [String],
 
 const Car = mongoose.model("Car", carSchema);
 
-// 5. CONFIGURACIÓN DE MULTER para Cloudinary
+// 5. CONFIGURACIÓN DE MULTER para Cloudinary (Versión 2.2.1)
 const storage = new CloudinaryStorage({
 cloudinary: cloudinary,
-params: {
-    folder: "luxury-garage-uploads",
-    allowed_formats: ["jpg", "png", "jpeg", "webp"],
-},
+  folder: "luxury-garage-uploads", // En esta versión, 'folder' va directo aquí
+  allowedFormats: ["jpg", "png", "jpeg", "webp"], // Nota que es 'allowedFormats' (con F mayúscula)
 });
 
-
 const upload = multer({ storage: storage });
+
 
 // ========================================
 // 🔐 MIDDLEWARE PARA PROTEGER RUTAS
