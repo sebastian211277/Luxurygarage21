@@ -23,6 +23,7 @@ api_key: process.env.CLOUDINARY_API_KEY,
 api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+
 // 1. CREAR CARPETA DE UPLOADS SI NO EXISTE (ya no es necesario para Cloudinary, pero se mantiene por si acaso)
 const uploadsDir = path.join(__dirname, "public", "uploads");
 if (!fs.existsSync(uploadsDir)) {
@@ -60,11 +61,13 @@ const Car = mongoose.model("Car", carSchema);
 // 5. CONFIGURACIÓN DE MULTER para Cloudinary (Versión 2.2.1)
 const storage = new CloudinaryStorage({
 cloudinary: cloudinary,
-  folder: "luxury-garage-uploads", // En esta versión, 'folder' va directo aquí
-  allowedFormats: ["jpg", "png", "jpeg", "webp"], // Nota que es 'allowedFormats' (con F mayúscula)
+folder: "luxury-garage-uploads",
+allowedFormats: ["jpg", "png", "jpeg", "webp"],
+  // Eliminamos 'params' porque en la v2.2.1 no se usa
 });
 
 const upload = multer({ storage: storage });
+
 
 
 // ========================================
