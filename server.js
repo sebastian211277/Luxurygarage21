@@ -7,9 +7,9 @@ const path = require("path");
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 
-// Nuevas importaciones para Cloudinary
+// IMPORTACIÓN CORREGIDA
 const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary").CloudinaryStorage; 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -60,10 +60,11 @@ const Car = mongoose.model("Car", carSchema);
 const storage = new CloudinaryStorage({
 cloudinary: cloudinary,
 params: {
-    folder: "luxury-garage-uploads", // Carpeta donde se guardarán las imágenes en Cloudinary
-    allowed_formats: ["jpg", "png", "jpeg", "webp"], // Formatos permitidos
+    folder: "luxury-garage-uploads",
+    allowed_formats: ["jpg", "png", "jpeg", "webp"],
 },
 });
+
 
 const upload = multer({ storage: storage });
 
